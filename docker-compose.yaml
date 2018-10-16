@@ -1,0 +1,46 @@
+version: '3'
+
+services:
+## XDS Server
+  xds-server:
+    image: tak2siva/envoy-pilot:latest
+    restart: on-failure
+    networks:
+      - xds-example
+    ports:
+      - "9090:9090"
+    expose:
+      - 7777
+    volumes:
+      - $PWD/env_values.txt:/.env
+      - $PWD/file_mode_config:/file_mode_config
+    command: "sh -c './Envoy-Pilot'"
+  
+## App Servers  
+  app1:
+    image: tak2siva/tiny-mock-server
+    environment:
+      PORT: 8123
+      CONTENT: 'this is app --ONE--'
+      CODE: 200
+    expose:
+      - 8123
+    networks:
+      - xds-example
+
+## Envoy
+  envoy:
+    image: envoyproxy/envoy:v1.7.0
+    volumes:
+      - $PWD/envoy-config.yaml:/envoy-config.yaml
+    command: ["envoy", "-c", "/envoy-config.yaml", "--v2-config-only", "-l", "info", "--service-cluster","adstest-cluster","--service-node","adstest-node"]
+    depends_on:
+      - xds-server
+    networks:
+      - xds-example
+    ports:
+      - "9901:9901"
+      - "10000:10000"
+
+networks:
+  xds-example:

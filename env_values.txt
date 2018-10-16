@@ -1,0 +1,2 @@
+FILE_MODE=true
+FOLDER_PATH=/file_mode_config
