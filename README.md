@@ -4,7 +4,6 @@ This docker compose setup contains:
 
     - Envoy (port: 10000)
     - App1 (port: 8123)
-    - App2 (port: 8126)
 
 To start 
 ```
